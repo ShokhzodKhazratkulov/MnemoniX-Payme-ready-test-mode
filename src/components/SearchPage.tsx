@@ -85,7 +85,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
     <div className="max-w-4xl mx-auto space-y-12 py-8 sm:py-12 px-4">
       {/* Header Text */}
       <AnimatePresence>
-        {state === AppState.IDLE && !mnemonic && (
+        {state === AppState.IDLE && !mnemonic && !searchQuery && searchRemaining === 5 && (
           <motion.div 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -109,23 +109,15 @@ export const SearchPage: React.FC<SearchPageProps> = ({
       {/* Search Bar */}
       <div className="space-y-6">
         <AnimatePresence>
-          {!isPremium && state === AppState.IDLE && (
+          {!isPremium && searchRemaining < 5 && searchRemaining > 0 && (
             <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               className="flex justify-center"
             >
-              <div className="px-6 py-2 bg-white dark:bg-white/5 backdrop-blur-md rounded-full border-2 border-accent/20 flex items-center gap-3 shadow-xl">
-                <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest"> {t.dashboard?.average ? t.dashboard.average.split(' ')[0] : 'DAILY'} LIMIT:</span>
-                <span className="text-sm font-black text-accent">{searchRemaining}/5 {t.premium?.searchesRemaining || 'SEARCH QOLDI'}</span>
-                <button 
-                  onClick={() => onNavigate(AppView.SUBSCRIPTION)}
-                  className="ml-2 text-[10px] font-black text-white bg-accent px-3 py-1 rounded-full hover:bg-accent-hover transition-colors"
-                >
-                  {t.premium?.unlimitedSearches || 'CHEKSIZ QILISH'}
-                </button>
-              </div>
+              <span className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] animate-fade-in">
+                {searchRemaining}/5 {t.premium?.searchesRemaining || 'SEARCH QOLDI'}
+              </span>
             </motion.div>
           )}
         </AnimatePresence>
