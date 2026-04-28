@@ -60,8 +60,28 @@ export function useMonetization(profile: Profile | null, setProfile: React.Dispa
       }
     } catch (err) {
       console.error('Error verifying device:', err);
-      // Fallback for web testing
+      // Fallback for web testing (capacitor might not be initialized)
       setIsDeviceAuthorized(true);
+    }
+  }, [profile, setProfile]);
+
+  const resetDevice = useCallback(async () => {
+    if (!profile) return;
+    try {
+      const info = await Device.getId();
+      const currentDeviceId = info.identifier;
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({ device_id: currentDeviceId })
+        .eq('id', profile.id);
+
+      if (!error) {
+        setProfile(prev => prev ? { ...prev, device_id: currentDeviceId } : null);
+        setIsDeviceAuthorized(true);
+      }
+    } catch (err) {
+      console.error('Error resetting device:', err);
     }
   }, [profile, setProfile]);
 
@@ -99,6 +119,7 @@ export function useMonetization(profile: Profile | null, setProfile: React.Dispa
     isPremium,
     isDeviceAuthorized,
     verifyDevice,
+    resetDevice,
     incrementSearchCount,
     searchRemaining: isPremium ? Infinity : Math.max(0, 5 - (profile?.daily_search_count || 0))
   };

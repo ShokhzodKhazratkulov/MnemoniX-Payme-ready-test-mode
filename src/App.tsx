@@ -106,7 +106,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedMnemonicForReview, setSelectedMnemonicForReview] = useState<SavedMnemonic | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfileType | null>(null);
-  const { isPremium, isDeviceAuthorized, verifyDevice, incrementSearchCount, searchRemaining } = useMonetization(userProfile, setUserProfile);
+  const { isPremium, isDeviceAuthorized, verifyDevice, resetDevice, incrementSearchCount, searchRemaining } = useMonetization(userProfile, setUserProfile);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
 
   const contentLanguage = useMemo(() => {
@@ -331,14 +331,25 @@ export default function App() {
     }
   }, [user, view]);
 
+  const fetchUserData = useCallback(async (userId: string) => {
+    try {
+      await Promise.all([
+        fetchProfile(userId),
+        fetchUserWords()
+      ]);
+      // Verify device only if not already checked or if profile refreshed
+      // verifyDevice is async and internally checks profile
+      verifyDevice();
+    } catch (err) {
+      console.error('Error fetching user initial data:', err);
+    }
+  }, [fetchProfile, fetchUserWords]);
+
   useEffect(() => {
     if (isAuthReady && user) {
-      fetchUserWords();
-      fetchProfile(user.id).then(() => {
-        verifyDevice();
-      });
+      fetchUserData(user.id);
     }
-  }, [user, isAuthReady, verifyDevice]);
+  }, [user, isAuthReady, fetchUserData]);
 
   // Force sign-in for unauthenticated users
   useEffect(() => {
@@ -1058,20 +1069,28 @@ export default function App() {
           <AlertCircle className="w-10 h-10 text-accent" />
         </div>
         <h1 className="text-2xl font-bold font-sans">Account is active on another device</h1>
-        <div className="space-y-2">
+        <div className="space-y-4">
           <p className="text-gray-500 max-w-sm">
             Sizning hisobingiz boshqa qurilmada faol. Xavfsizlik choralari tufayli faqat bitta qurilmada foydalanish mumkin.
           </p>
-          <p className="text-xs text-gray-400">
-            Agar bu xatolik bo'lsa, iltimos boshqa qurilmadan tizimdan chiqing.
+          <p className="text-sm text-gray-400">
+            Agar ushbu qurilmadan foydalanmoqchi bo'lsangiz, avvalgisini bloklang.
           </p>
         </div>
-        <button 
-          onClick={() => supabase.auth.signOut()}
-          className="px-8 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent-hover transition-all"
-        >
-          {t.logout || 'Tizimdan chiqish'}
-        </button>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <button 
+            onClick={resetDevice}
+            className="w-full px-8 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent-hover transition-all"
+          >
+            USHBU QURILMANI TASDIQLASH
+          </button>
+          <button 
+            onClick={() => supabase.auth.signOut()}
+            className="w-full px-8 py-3 bg-gray-100 dark:bg-white/10 rounded-xl font-bold hover:bg-gray-200 transition-all"
+          >
+            TIZIMDAN CHIQISH
+          </button>
+        </div>
       </div>
     );
   }

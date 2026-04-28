@@ -119,8 +119,8 @@ export const Posts = React.memo(({ user, language, theme, viewMode = 'all', isPr
       return matchesSearch && matchesLanguage;
     });
 
-    // Enforce 5 post limit for Freemium users in the 'all' view
-    if (!isPremium && viewMode === 'all') {
+    // Enforce 5 post limit for Freemium users in the 'all' view OR when searching
+    if (!isPremium && (viewMode === 'all' || !!searchQuery)) {
       return results.slice(0, 5);
     }
 

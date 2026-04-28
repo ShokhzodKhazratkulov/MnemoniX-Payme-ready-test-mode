@@ -216,6 +216,7 @@ export const Profile = React.memo(({ user, savedMnemonics, totalWords, masteredC
   const subscriptionExpiresAt = profile?.subscription_expires_at ? new Date(profile.subscription_expires_at) : null;
   const isTrialExpired = trialEndsAt ? trialEndsAt.getTime() < Date.now() : false;
   const isPremium = profile?.subscription_tier === SubscriptionTier.PREMIUM;
+  const isTrial = !isPremium && trialEndsAt && trialEndsAt.getTime() > Date.now();
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
@@ -255,14 +256,19 @@ export const Profile = React.memo(({ user, savedMnemonics, totalWords, masteredC
                 PREMIUM
               </span>
             )}
-            {user && !isPremium && (
-              <span className={`px-4 py-1.5 rounded-full text-sm font-bold border ${isTrialExpired ? 'bg-red-50 text-red-600 border-red-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
-                {isTrialExpired ? t.trialExpired : `${t.trialEnds}: ${trialEndsAt?.toLocaleDateString()}`}
+            {user && isTrial && (
+              <span className="px-4 py-1.5 bg-amber-50 text-amber-600 rounded-full text-sm font-bold border border-amber-100">
+                TRIAL ENDS: {trialEndsAt?.toLocaleDateString()}
+              </span>
+            )}
+            {user && !isPremium && !isTrial && (
+              <span className="px-4 py-1.5 bg-red-50 text-red-600 rounded-full text-sm font-bold border border-red-100">
+                TRIAL EXPIRED
               </span>
             )}
             {user && isPremium && subscriptionExpiresAt && (
               <span className="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm font-bold border border-blue-100">
-                Premium ends: {subscriptionExpiresAt.toLocaleDateString()}
+                PREMIUM ENDS: {subscriptionExpiresAt.toLocaleDateString()}
               </span>
             )}
           </div>

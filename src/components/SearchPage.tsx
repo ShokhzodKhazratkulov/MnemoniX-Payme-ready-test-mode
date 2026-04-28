@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Mic, Loader2, AlertCircle, Sparkles, Brain, Clock, History } from 'lucide-react';
+import { Search, Mic, Loader2, AlertCircle, Sparkles, Brain, Clock, History, Zap } from 'lucide-react';
 import { AppState, Language, MnemonicResponse, SavedMnemonic, AppView } from '../types';
 import { MnemonicCard } from './MnemonicCard';
 
@@ -176,6 +176,38 @@ export const SearchPage: React.FC<SearchPageProps> = ({
             </button>
           </div>
         </form>
+
+        {/* Limit Reached UI */}
+        <AnimatePresence>
+          {!isPremium && searchRemaining <= 0 && state === AppState.IDLE && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mt-8 bg-gradient-to-br from-slate-900 to-indigo-950 rounded-[2.5rem] p-8 text-center space-y-6 shadow-2xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Sparkles size={100} className="text-accent" />
+              </div>
+              <div className="relative z-10 space-y-4">
+                <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto text-accent">
+                  <Zap size={32} />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-black text-white">Kunlik limit tugadi</h3>
+                  <p className="text-indigo-200/60 font-medium">
+                    Bugun uchun 5 ta search limitidan foydalanib bo'ldingiz. Cheksiz searchlar uchun Premiumga o'ting.
+                  </p>
+                </div>
+                <button 
+                  onClick={() => onNavigate(AppView.SUBSCRIPTION)}
+                  className="px-10 py-4 bg-accent text-white rounded-2xl font-black text-sm shadow-xl shadow-accent/20 hover:bg-accent-hover transition-all active:scale-95"
+                >
+                  PREMIUMGA O'TISH
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Recent Searches */}
         <AnimatePresence>
