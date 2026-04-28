@@ -127,6 +127,8 @@ export const Posts = React.memo(({ user, language, theme, viewMode = 'all', isPr
     return results;
   }, [posts, hiddenPosts, searchQuery, language, viewMode, user?.id, isPremium]);
 
+  const hasMorePostsHidden = !isPremium && viewMode === 'all' && posts.filter(p => !hiddenPosts.includes(p.id) && p.language === language).length > 5;
+
   const leaderboard = React.useMemo(() => {
     const counts: Record<string, { username: string, count: number }> = {};
     posts.forEach(p => {
@@ -420,7 +422,38 @@ export const Posts = React.memo(({ user, language, theme, viewMode = 'all', isPr
           </div>
         )}
 
-        {hasMore && filteredPosts.length > 0 && (
+        {hasMorePostsHidden && (
+          <div className="relative overflow-hidden rounded-[2.5rem] border-4 border-dashed border-gray-200 dark:border-white/10 p-12 text-center space-y-6">
+            <div className="absolute inset-0 bg-neutral/50 dark:bg-primary/50 backdrop-blur-[64px] z-10" />
+            
+            <div className="relative z-20 space-y-6">
+              <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto text-accent animate-pulse">
+                <Plus size={40} />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black text-gray-900 dark:text-white">Yana 100+ postlar yashirin</h3>
+                <p className="text-gray-500 dark:text-gray-400 font-medium max-w-sm mx-auto">
+                  Premium obunaga o'tib barcha foydalanuvchilarning kreativ postlarini ko'rishingiz mumkin.
+                </p>
+              </div>
+              <button 
+                onClick={() => onNavigate?.(AppView.SUBSCRIPTION)}
+                className="px-10 py-4 bg-accent text-white rounded-2xl font-black text-sm shadow-xl shadow-accent/20 hover:bg-accent-hover transition-all active:scale-95"
+              >
+                PREMIUMGA O'TISH
+              </button>
+            </div>
+
+            {/* Fake Blurred Post Content */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none flex flex-col items-center justify-center gap-4 py-8 px-4">
+              <div className="w-full h-4 bg-gray-300 rounded-full" />
+              <div className="w-2/3 h-4 bg-gray-300 rounded-full" />
+              <div className="w-full h-32 bg-gray-300 rounded-3xl" />
+            </div>
+          </div>
+        )}
+
+        {hasMore && filteredPosts.length > 0 && isPremium && (
           <div className="flex justify-center pt-4 pb-8">
             <button
               onClick={loadMore}

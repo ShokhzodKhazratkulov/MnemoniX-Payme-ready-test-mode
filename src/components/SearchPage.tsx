@@ -107,7 +107,29 @@ export const SearchPage: React.FC<SearchPageProps> = ({
       </AnimatePresence>
 
       {/* Search Bar */}
-      <div className="space-y-8">
+      <div className="space-y-6">
+        <AnimatePresence>
+          {!isPremium && state === AppState.IDLE && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex justify-center"
+            >
+              <div className="px-6 py-2 bg-white dark:bg-white/5 backdrop-blur-md rounded-full border-2 border-accent/20 flex items-center gap-3 shadow-xl">
+                <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest"> Bugungi limit:</span>
+                <span className="text-sm font-black text-accent">{searchRemaining}/5 SEARCH QOLDI</span>
+                <button 
+                  onClick={() => onNavigate(AppView.SUBSCRIPTION)}
+                  className="ml-2 text-[10px] font-black text-white bg-accent px-3 py-1 rounded-full hover:bg-accent-hover transition-colors"
+                >
+                  CHEKSIZ QILISH
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <form 
           onSubmit={handleSearch}
           className="relative group flex items-center bg-white dark:bg-primary/50 backdrop-blur-xl border-2 border-gray-100 dark:border-white/10 rounded-[2.5rem] shadow-2xl shadow-accent/5 dark:shadow-none focus-within:border-accent/50 focus-within:ring-4 focus-within:ring-accent/5 transition-all p-1.5 sm:p-3 overflow-hidden"
@@ -157,21 +179,6 @@ export const SearchPage: React.FC<SearchPageProps> = ({
 
         {/* Recent Searches */}
         <AnimatePresence>
-          {!isPremium && state === AppState.IDLE && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex justify-center"
-            >
-              <div className="px-4 py-2 bg-accent/10 rounded-full border border-accent/10 flex items-center gap-2">
-                <Sparkles size={14} className="text-accent" />
-                <span className="text-xs font-bold text-accent uppercase tracking-widest">
-                  {searchRemaining} {t.searchesRemaining || 'LIMIT QOLDI'}
-                </span>
-              </div>
-            </motion.div>
-          )}
-
           {showRecent && state === AppState.IDLE && lastSearches.length > 0 && (
             <motion.div 
               initial={{ opacity: 0, y: -10 }}

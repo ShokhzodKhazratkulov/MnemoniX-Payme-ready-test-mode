@@ -26,12 +26,6 @@ import {
 import { Language, AppView, SavedMnemonic, AppTheme, SubscriptionTier } from '../types';
 import { supabase } from '../supabaseClient';
 
-const PACKAGES = [
-  { id: '1_month', price: 36000, months: 1, label: '1 OY', daily: '1,200 UZS', color: 'blue' },
-  { id: '3_months', price: 96000, months: 3, label: '3 OY', daily: '1,066 UZS', popular: true, color: 'accent' },
-  { id: '6_months', price: 180000, months: 6, label: '6 OY', daily: '1,000 UZS', color: 'purple' },
-];
-
 interface Props {
   user: any;
   savedMnemonics: SavedMnemonic[];
@@ -212,59 +206,16 @@ export const Profile = React.memo(({ user, savedMnemonics, totalWords, masteredC
     }
   };
 
-  const handleSubscribe = async (pkg: typeof PACKAGES[0]) => {
-    if (!user) {
-      onSignIn();
-      return;
-    }
-
-    const orderId = `order_${user.id}_${Date.now()}`;
-    const amountInTiyin = pkg.price * 100;
-    
-    setIsUpdating(true);
-    try {
-      // 1. Create payment record
-      const { error } = await supabase.from('payments').insert({
-        user_id: user.id,
-        order_id: orderId,
-        amount: amountInTiyin,
-        package_type: pkg.id,
-        status: 'pending'
-      });
-
-      if (error) throw error;
-
-      // 2. Build Payme Checkout URL
-      // Base64(m=merchant_id;ac.order_id=order_id;a=amount)
-      const merchantId = import.meta.env.VITE_PAYME_MERCHANT_ID;
-      if (!merchantId) {
-        throw new Error("Payme Merchant ID missing");
-      }
-
-      const params = `m=${merchantId};ac.order_id=${orderId};a=${amountInTiyin}`;
-      const base64Params = btoa(params);
-      const checkoutUrl = `https://checkout.paycom.uz/${base64Params}`;
-
-      // 3. Open link
-      window.open(checkoutUrl, '_blank');
-      
-      alert(t.paymentRedirect || "Payme to'lov sahifasiga o'tilmoqda...");
-    } catch (err: any) {
-      console.error('Error starting payment:', err);
-      alert((t.errorOccurred || 'An error occurred') + ': ' + err.message);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
   const getMonthName = (date: Date) => {
     return fullT.months[date.getMonth()] || fullT.months[0];
   };
 
   const joinDate = user ? `${getMonthName(new Date(user.created_at))} ${new Date(user.created_at).getFullYear()}` : t.guestSession;
 
-  const trialEndsAt = user?.trial_ends_at ? new Date(user.trial_ends_at) : null;
+  const trialEndsAt = profile?.trial_started_at ? new Date(new Date(profile.trial_started_at).getTime() + 7 * 24 * 60 * 60 * 1000) : null;
+  const subscriptionExpiresAt = profile?.subscription_expires_at ? new Date(profile.subscription_expires_at) : null;
   const isTrialExpired = trialEndsAt ? trialEndsAt.getTime() < Date.now() : false;
+  const isPremium = profile?.subscription_tier === SubscriptionTier.PREMIUM;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
@@ -298,90 +249,49 @@ export const Profile = React.memo(({ user, savedMnemonics, totalWords, masteredC
                 {t.guestModeNote}
               </p>
             )}
-            {user && (profile?.subscription_tier === SubscriptionTier.PREMIUM) && (
+            {user && isPremium && (
               <span className="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-sm font-bold border border-emerald-100 flex items-center gap-2">
                 <CheckCircle2 size={14} />
                 PREMIUM
               </span>
             )}
-            {user && (profile?.subscription_tier !== SubscriptionTier.PREMIUM) && (
+            {user && !isPremium && (
               <span className={`px-4 py-1.5 rounded-full text-sm font-bold border ${isTrialExpired ? 'bg-red-50 text-red-600 border-red-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
                 {isTrialExpired ? t.trialExpired : `${t.trialEnds}: ${trialEndsAt?.toLocaleDateString()}`}
+              </span>
+            )}
+            {user && isPremium && subscriptionExpiresAt && (
+              <span className="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm font-bold border border-blue-100">
+                Premium ends: {subscriptionExpiresAt.toLocaleDateString()}
               </span>
             )}
           </div>
         </div>
       </motion.div>
 
-      {/* Subscription Plans */}
-      {user && profile?.subscription_tier !== SubscriptionTier.PREMIUM && (
+      {/* Subscription Status Card */}
+      {user && (
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-[2.5rem] p-8 sm:p-10 shadow-2xl relative overflow-hidden"
+          className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 shadow-lg border border-gray-100 dark:border-slate-800 flex items-center justify-between"
         >
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
-            <Zap size={160} className="text-white" />
-          </div>
-          <div className="absolute -bottom-8 -left-8 p-8 opacity-5">
-            <Sparkles size={120} className="text-white" />
-          </div>
-
-          <div className="relative z-10 space-y-8">
-            <div className="text-center space-y-2">
-              <h3 className="text-2xl sm:text-3xl font-black text-white flex items-center justify-center gap-3">
-                <Sparkles className="text-emerald-400" />
-                {t.unlockPremium || "Premiumga o'ting"}
-              </h3>
-              <p className="text-indigo-200/60 font-medium max-w-lg mx-auto">
-                {t.premiumBenefits || "Cheksiz searchlar, postlar va barcha premium imkoniyatlaridan bahramand bo'ling."}
-              </p>
+          <div className="flex items-center gap-4">
+            <div className={`p-3 rounded-2xl ${isPremium ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
+              {isPremium ? <Sparkles size={24} /> : <Zap size={24} />}
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {PACKAGES.map((pkg) => (
-                <div 
-                  key={pkg.id}
-                  className={`relative bg-white/5 backdrop-blur-sm border-2 rounded-[2rem] p-6 transition-all hover:bg-white/10 ${
-                    pkg.popular ? 'border-accent shadow-lg shadow-accent/20 scale-105 z-10' : 'border-white/10'
-                  }`}
-                >
-                  {pkg.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-accent text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg">
-                      {t.popular || 'MASHHUR'}
-                    </div>
-                  )}
-                  <div className="text-center space-y-4">
-                    <div>
-                      <p className="text-indigo-200/60 text-[10px] font-black uppercase tracking-widest mb-1">{pkg.label}</p>
-                      <h4 className="text-2xl font-black text-white">{pkg.price.toLocaleString()} SUM</h4>
-                    </div>
-                    <div className="py-3 border-y border-white/5">
-                      <p className="text-indigo-200/40 text-[10px] font-bold">KUNIGA TAXMINAN</p>
-                      <p className="text-lg font-black text-emerald-400">{pkg.daily}</p>
-                    </div>
-                    <button 
-                      onClick={() => handleSubscribe(pkg)}
-                      disabled={isUpdating}
-                      className={`w-full py-3 rounded-2xl font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-2 ${
-                        pkg.popular ? 'bg-accent text-white hover:bg-accent-hover' : 'bg-white/10 text-white hover:bg-white/20'
-                      }`}
-                    >
-                      {isUpdating ? <Loader2 className="animate-spin" size={18} /> : <CreditCard size={18} />}
-                      {t.selectPlan || 'TANLASH'}
-                    </button>
-                  </div>
-                </div>
-              ))}
+            <div>
+              <p className="text-xs font-black text-gray-400 uppercase tracking-widest leading-none mb-1">PLANT TURI</p>
+              <h4 className="text-xl font-black">{isPremium ? 'Premium Active' : 'Freemium'}</h4>
             </div>
-
-            <p className="text-center text-[10px] text-white/30 font-bold uppercase tracking-widest leading-relaxed">
-              * TO'LOV PAYME ORQALI AMALGA OSHIRILADI. <br/>
-              OBUNA MUDDATI TUGAGACH AVTOMATIK RAVISHDA FREEMIUM PLANGA O'TILADI.
-            </p>
           </div>
+          <button 
+            onClick={() => onNavigate(AppView.SUBSCRIPTION)}
+            className="px-6 py-2.5 bg-accent text-white rounded-xl font-black text-xs hover:bg-accent-hover transition-all active:scale-95 shadow-lg shadow-accent/20"
+          >
+            {isPremium ? 'MANAGE SUBSCRIPTION' : 'UPGRADE NOW'}
+          </button>
         </motion.div>
       )}
 

@@ -54,6 +54,7 @@ import { CategoriesPage } from './components/CategoriesPage';
 import { CategoryDetailPage } from './components/CategoryDetailPage';
 import { Personalization } from './components/Personalization';
 import { BulkUpload } from './components/BulkUpload';
+import { SubscriptionPage } from './components/SubscriptionPage';
 
 import { TRANSLATIONS } from './constants/translations';
 import { Profile as UserProfileType } from './types';
@@ -1597,6 +1598,18 @@ export default function App() {
                 t={t} 
                 user={user}
                 currentLanguage={contentLanguage}
+              />
+            </motion.div>
+          )}
+
+          {view === AppView.SUBSCRIPTION && (
+            <motion.div key="subscription-page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <SubscriptionPage 
+                user={user} 
+                onNavigate={navigateTo} 
+                language={language} 
+                t={t} 
+                onSignIn={() => setView(AppView.AUTH)} 
               />
             </motion.div>
           )}
