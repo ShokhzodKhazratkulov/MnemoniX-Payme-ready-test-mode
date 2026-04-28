@@ -85,7 +85,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({
     <div className="max-w-4xl mx-auto space-y-12 py-8 sm:py-12 px-4">
       {/* Header Text */}
       <AnimatePresence>
-        {state === AppState.IDLE && !mnemonic && !searchQuery && searchRemaining === 5 && (
+        {state === AppState.IDLE && !mnemonic && !searchQuery && (
           <motion.div 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
