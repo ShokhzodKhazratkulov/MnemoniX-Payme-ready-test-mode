@@ -253,22 +253,22 @@ export const Profile = React.memo(({ user, savedMnemonics, totalWords, masteredC
             {user && isPremium && (
               <span className="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-sm font-bold border border-emerald-100 flex items-center gap-2">
                 <CheckCircle2 size={14} />
-                PREMIUM
+                {t.premium?.title || 'PREMIUM'}
               </span>
             )}
             {user && isTrial && (
               <span className="px-4 py-1.5 bg-amber-50 text-amber-600 rounded-full text-sm font-bold border border-amber-100">
-                TRIAL ENDS: {trialEndsAt?.toLocaleDateString()}
+                {(t.premium?.trialEnds || 'TRIAL ENDS')}: {trialEndsAt?.toLocaleDateString()}
               </span>
             )}
             {user && !isPremium && !isTrial && (
               <span className="px-4 py-1.5 bg-red-50 text-red-600 rounded-full text-sm font-bold border border-red-100">
-                TRIAL EXPIRED
+                {t.premium?.trialExpired || 'TRIAL EXPIRED'}
               </span>
             )}
             {user && isPremium && subscriptionExpiresAt && (
               <span className="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm font-bold border border-blue-100">
-                PREMIUM ENDS: {subscriptionExpiresAt.toLocaleDateString()}
+                {(t.premium?.premiumEnds || 'PREMIUM ENDS')}: {subscriptionExpiresAt.toLocaleDateString()}
               </span>
             )}
           </div>
@@ -288,15 +288,15 @@ export const Profile = React.memo(({ user, savedMnemonics, totalWords, masteredC
               {isPremium ? <Sparkles size={24} /> : <Zap size={24} />}
             </div>
             <div>
-              <p className="text-xs font-black text-gray-400 uppercase tracking-widest leading-none mb-1">PLANT TURI</p>
-              <h4 className="text-xl font-black">{isPremium ? 'Premium Active' : 'Freemium'}</h4>
+              <p className="text-xs font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{t.premium?.planType || 'PLAN TYPE'}</p>
+              <h4 className="text-xl font-black">{isPremium ? (t.premium?.active || 'Premium Active') : (t.premium?.freemium || 'Freemium')}</h4>
             </div>
           </div>
           <button 
             onClick={() => onNavigate(AppView.SUBSCRIPTION)}
             className="px-6 py-2.5 bg-accent text-white rounded-xl font-black text-xs hover:bg-accent-hover transition-all active:scale-95 shadow-lg shadow-accent/20"
           >
-            {isPremium ? 'MANAGE SUBSCRIPTION' : 'UPGRADE NOW'}
+            {isPremium ? (t.premium?.manageSubscription || 'MANAGE SUBSCRIPTION') : (t.premium?.upgradeNow || 'UPGRADE NOW')}
           </button>
         </motion.div>
       )}

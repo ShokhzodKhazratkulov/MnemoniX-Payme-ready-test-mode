@@ -227,16 +227,16 @@ export const Posts = React.memo(({ user, language, theme, viewMode = 'all', isPr
           <Award size={48} />
         </div>
         <div className="space-y-4">
-          <h2 className="text-3xl font-black text-gray-900 dark:text-white">Premium required</h2>
+          <h2 className="text-3xl font-black text-gray-900 dark:text-white">{t.premium?.premiumRequired || "Premium required"}</h2>
           <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto font-medium">
-            Post yaratish uchun Premium obunachisi bo'lishingiz kerak.
+            {t.premium?.premiumRequiredDesc || "Post yaratish uchun Premium obunachisi bo'lishingiz kerak."}
           </p>
         </div>
         <button 
           onClick={() => onNavigate?.(AppView.PROFILE)}
           className="px-12 py-4 bg-accent text-white rounded-full font-black text-lg shadow-xl shadow-accent/20 hover:bg-accent-hover transition-all active:scale-95"
         >
-          {t.upgrade || 'Upgrade Now'}
+          {t.premium?.upgradeNow || 'Upgrade Now'}
         </button>
       </div>
     );
@@ -431,16 +431,16 @@ export const Posts = React.memo(({ user, language, theme, viewMode = 'all', isPr
                 <Plus size={40} />
               </div>
               <div className="space-y-2">
-                <h3 className="text-2xl font-black text-gray-900 dark:text-white">Yana 100+ postlar yashirin</h3>
+                <h3 className="text-2xl font-black text-gray-900 dark:text-white">{t.premium?.postsHidden || "Yana 100+ postlar yashirin"}</h3>
                 <p className="text-gray-500 dark:text-gray-400 font-medium max-w-sm mx-auto">
-                  Premium obunaga o'tib barcha foydalanuvchilarning kreativ postlarini ko'rishingiz mumkin.
+                  {t.premium?.postsHiddenDesc || "Premium obunaga o'tib barcha foydalanuvchilarning kreativ postlarini ko'rishingiz mumkin."}
                 </p>
               </div>
               <button 
                 onClick={() => onNavigate?.(AppView.SUBSCRIPTION)}
                 className="px-10 py-4 bg-accent text-white rounded-2xl font-black text-sm shadow-xl shadow-accent/20 hover:bg-accent-hover transition-all active:scale-95"
               >
-                PREMIUMGA O'TISH
+                {t.premium?.upgradeNow || "PREMIUMGA O'TISH"}
               </button>
             </div>
 

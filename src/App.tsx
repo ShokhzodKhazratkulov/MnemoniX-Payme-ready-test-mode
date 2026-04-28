@@ -1068,13 +1068,13 @@ export default function App() {
         <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center">
           <AlertCircle className="w-10 h-10 text-accent" />
         </div>
-        <h1 className="text-2xl font-bold font-sans">Account is active on another device</h1>
+        <h1 className="text-2xl font-bold font-sans">{t.premium?.deviceLockedTitle || "Account is active on another device"}</h1>
         <div className="space-y-4">
           <p className="text-gray-500 max-w-sm">
-            Sizning hisobingiz boshqa qurilmada faol. Xavfsizlik choralari tufayli faqat bitta qurilmada foydalanish mumkin.
+            {t.premium?.deviceLockedDesc || "Sizning hisobingiz boshqa qurilmada faol. Xavfsizlik choralari tufayli faqat bitta qurilmada foydalanish mumkin."}
           </p>
           <p className="text-sm text-gray-400">
-            Agar ushbu qurilmadan foydalanmoqchi bo'lsangiz, avvalgisini bloklang.
+            {t.premium?.deviceLockedNote || "Agar ushbu qurilmadan foydalanmoqchi bo'lsangiz, avvalgisini bloklang."}
           </p>
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
@@ -1082,13 +1082,13 @@ export default function App() {
             onClick={resetDevice}
             className="w-full px-8 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent-hover transition-all"
           >
-            USHBU QURILMANI TASDIQLASH
+            {t.premium?.confirmDevice || "USHBU QURILMANI TASDIQLASH"}
           </button>
           <button 
             onClick={() => supabase.auth.signOut()}
             className="w-full px-8 py-3 bg-gray-100 dark:bg-white/10 rounded-xl font-bold hover:bg-gray-200 transition-all"
           >
-            TIZIMDAN CHIQISH
+            {t.profile?.signOut || "TIZIMDAN CHIQISH"}
           </button>
         </div>
       </div>

@@ -108,8 +108,8 @@ export const SubscriptionPage: React.FC<Props> = ({ user, onNavigate, language, 
             <ChevronLeft />
           </button>
           <div className="text-right">
-            <h2 className="text-3xl font-black">{t.premiumPlans || "Premium Rejalar"}</h2>
-            <p className="text-gray-500 text-sm font-medium">{t.choosePlan || "O'zingizga mos rejani tanlang"}</p>
+            <h2 className="text-3xl font-black">{t.premium?.plans || "Premium Rejalar"}</h2>
+            <p className="text-gray-500 text-sm font-medium">{t.premium?.choosePlan || "O'zingizga mos rejani tanlang"}</p>
           </div>
         </div>
 
@@ -119,21 +119,21 @@ export const SubscriptionPage: React.FC<Props> = ({ user, onNavigate, language, 
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/20 rounded-full border border-accent/20">
                 <Sparkles size={16} className="text-accent" />
-                <span className="text-xs font-black uppercase tracking-widest">{t.bestOffer || "Eng yaxshi tanlov"}</span>
+                <span className="text-xs font-black uppercase tracking-widest">{t.premium?.bestOffer || "Eng yaxshi tanlov"}</span>
               </div>
               <h1 className="text-4xl sm:text-5xl font-black leading-tight">
-                {t.unlockFullPotential || "Barcha imkoniyatlarni ishga soling"}
+                {t.premium?.unlockFullPotential || "Barcha imkoniyatlarni ishga soling"}
               </h1>
               <p className="text-indigo-200/60 leading-relaxed font-medium">
-                {t.premiumBenefitsDesc || "MnemonikX Premium bilan so'z boyligingizni cheksiz oshiring. Hech qanday limitlar va to'siqlarsiz o'rganing."}
+                {t.premium?.premiumBenefitsDesc || "MnemonikX Premium bilan so'z boyligingizni cheksiz oshiring. Hech qanday limitlar va to'siqlarsiz o'rganing."}
               </p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               {[
-                { icon: InfinityIcon, label: 'Search' },
-                { icon: MessageSquare, label: 'AI Voice' },
-                { icon: Star, label: 'Posts' },
+                { icon: InfinityIcon, label: t.navSearch || 'Search' },
+                { icon: MessageSquare, label: t.btnVoice || 'AI Voice' },
+                { icon: Star, label: t.navPosts || 'Posts' },
                 { icon: ShieldCheck, label: 'Security' }
               ].map((feature, i) => (
                 <div key={i} className="p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl flex flex-col items-center gap-3">
@@ -161,13 +161,13 @@ export const SubscriptionPage: React.FC<Props> = ({ user, onNavigate, language, 
             >
               {pkg.popular && (
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-6 py-2 bg-accent text-white text-xs font-black rounded-full uppercase tracking-widest shadow-xl">
-                  {t.mostPopular || 'ENG MASHHUR'}
+                  {t.premium?.popular || 'ENG MASHHUR'}
                 </div>
               )}
 
               <div className="flex-1 space-y-8">
                 <div className="text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{pkg.label} OBUNA</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">{pkg.label} {t.premium?.title || 'OBUNA'}</p>
                   <h3 className="text-3xl font-black">{pkg.price.toLocaleString()} UZS</h3>
                   <div className="mt-2 text-xs font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full inline-block">
                     Kuniga {pkg.daily}
@@ -194,7 +194,7 @@ export const SubscriptionPage: React.FC<Props> = ({ user, onNavigate, language, 
                 }`}
               >
                 {isUpdating ? <Loader2 className="animate-spin" size={18} /> : <CreditCard size={18} />}
-                {t.selectThisPlan || 'DAVOM ETISH'}
+                {t.premium?.selectPlan || 'DAVOM ETISH'}
               </button>
             </motion.div>
           ))}
@@ -203,10 +203,10 @@ export const SubscriptionPage: React.FC<Props> = ({ user, onNavigate, language, 
         <div className="text-center space-y-6">
           <div className="flex items-center justify-center gap-2 text-gray-400 font-bold text-[10px] uppercase tracking-widest">
             <ShieldCheck size={14} className="text-emerald-500" />
-            Xavfsiz to'lov tizimi (Payme)
+            {t.premium?.securePayment || "Xavfsiz to'lov tizimi (Payme)"}
           </div>
           <p className="text-[10px] text-gray-400 max-w-sm mx-auto leading-relaxed">
-            Obuna orqali siz MnemonikX litsenziya shartlariga rozilik bildirasiz. To'lovlar qaytarilmaydi.
+            {t.premium?.paymentNote || "Obuna orqali siz MnemonikX litsenziya shartlariga rozilik bildirasiz. To'lovlar qaytarilmaydi."}
           </p>
         </div>
       </div>

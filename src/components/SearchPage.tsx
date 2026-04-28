@@ -117,13 +117,13 @@ export const SearchPage: React.FC<SearchPageProps> = ({
             >
               <div className="px-6 py-2 bg-white dark:bg-white/5 backdrop-blur-md rounded-full border-2 border-accent/20 flex items-center gap-3 shadow-xl">
                 <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest"> Bugungi limit:</span>
-                <span className="text-sm font-black text-accent">{searchRemaining}/5 SEARCH QOLDI</span>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest"> {t.dashboard?.average ? t.dashboard.average.split(' ')[0] : 'DAILY'} LIMIT:</span>
+                <span className="text-sm font-black text-accent">{searchRemaining}/5 {t.premium?.searchesRemaining || 'SEARCH QOLDI'}</span>
                 <button 
                   onClick={() => onNavigate(AppView.SUBSCRIPTION)}
                   className="ml-2 text-[10px] font-black text-white bg-accent px-3 py-1 rounded-full hover:bg-accent-hover transition-colors"
                 >
-                  CHEKSIZ QILISH
+                  {t.premium?.unlimitedSearches || 'CHEKSIZ QILISH'}
                 </button>
               </div>
             </motion.div>
@@ -193,16 +193,16 @@ export const SearchPage: React.FC<SearchPageProps> = ({
                   <Zap size={32} />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-2xl font-black text-white">Kunlik limit tugadi</h3>
+                  <h3 className="text-2xl font-black text-white">{t.premium?.limitReached || "Kunlik limit tugadi"}</h3>
                   <p className="text-indigo-200/60 font-medium">
-                    Bugun uchun 5 ta search limitidan foydalanib bo'ldingiz. Cheksiz searchlar uchun Premiumga o'ting.
+                    {t.premium?.limitReachedDesc || "Bugun uchun 5 ta search limitidan foydalanib bo'ldingiz. Cheksiz searchlar uchun Premiumga o'ting."}
                   </p>
                 </div>
                 <button 
                   onClick={() => onNavigate(AppView.SUBSCRIPTION)}
                   className="px-10 py-4 bg-accent text-white rounded-2xl font-black text-sm shadow-xl shadow-accent/20 hover:bg-accent-hover transition-all active:scale-95"
                 >
-                  PREMIUMGA O'TISH
+                  {t.premium?.upgradeNow || "PREMIUMGA O'TISH"}
                 </button>
               </div>
             </motion.div>
@@ -323,20 +323,57 @@ export const SearchPage: React.FC<SearchPageProps> = ({
         )}
 
         {state === AppState.ERROR && (
-          <div className="max-w-md mx-auto glass-card p-10 text-center space-y-6">
-            <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
-              <AlertCircle size={40} />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-3xl font-black text-gray-900 dark:text-white">{t.errorTitle}</h3>
-              <p className="text-red-600 dark:text-red-400 font-medium text-lg">{error}</p>
-            </div>
-            <button 
-              onClick={() => searchQuery ? handleSearch() : setState(AppState.IDLE)}
-              className="w-full py-4 bg-white dark:bg-slate-900 text-red-600 dark:text-red-400 border-2 border-red-100 dark:border-red-900/30 rounded-2xl font-black hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
-            >
-              {t.retry}
-            </button>
+          <div className="w-full">
+            {(error?.toLowerCase().includes('limit') || searchRemaining <= 0) ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="max-w-2xl mx-auto bg-gradient-to-br from-slate-900 to-indigo-950 rounded-[2.5rem] p-10 text-center space-y-8 shadow-2xl relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 p-6 opacity-10">
+                  <Sparkles size={120} className="text-accent" />
+                </div>
+                <div className="relative z-10 space-y-6">
+                  <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto text-accent shadow-xl shadow-accent/10">
+                    <Zap size={40} />
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-3xl font-black text-white">{t.premium?.limitReached || "Kunlik limit tugadi"}</h3>
+                    <p className="text-indigo-200/60 font-medium text-lg max-w-sm mx-auto">
+                      {t.premium?.limitReachedDesc || "Bugun uchun 5 ta search limitidan foydalanib bo'ldingiz. Cheksiz searchlar uchun Premiumga o'ting."}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => onNavigate(AppView.SUBSCRIPTION)}
+                    className="px-12 py-5 bg-accent text-white rounded-2xl font-black text-base shadow-2xl shadow-accent/40 hover:bg-accent-hover transition-all active:scale-95 uppercase tracking-widest"
+                  >
+                    {t.premium?.upgradeNow || "PREMIUMGA O'TISH"}
+                  </button>
+                  <button 
+                    onClick={() => setState(AppState.IDLE)}
+                    className="block mx-auto text-xs font-black text-white/30 hover:text-white transition-colors uppercase tracking-widest pt-4"
+                  >
+                    {t.retry || "RETRY"}
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <div className="max-w-md mx-auto glass-card p-10 text-center space-y-6">
+                <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
+                  <AlertCircle size={40} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-black text-gray-900 dark:text-white">{t.errorTitle}</h3>
+                  <p className="text-red-600 dark:text-red-400 font-medium text-lg">{error}</p>
+                </div>
+                <button 
+                  onClick={() => searchQuery ? handleSearch() : setState(AppState.IDLE)}
+                  className="w-full py-4 bg-white dark:bg-slate-900 text-red-600 dark:text-red-400 border-2 border-red-100 dark:border-red-900/30 rounded-2xl font-black hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
+                >
+                  {t.retry}
+                </button>
+              </div>
+            )}
           </div>
         )}
 
