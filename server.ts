@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Initialize Supabase Admin client
 const supabase = createClient(
@@ -18,6 +18,18 @@ const supabase = createClient(
 );
 
 app.use(bodyParser.json());
+
+// Health check for troubleshooting
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    env: {
+      hasPaymeKey: !!process.env.PAYME_KEY,
+      nodeEnv: process.env.NODE_ENV
+    }
+  });
+});
 
 // Payme Merchant API Handler
 app.post("/api/payme", async (req: Request, res: Response) => {
