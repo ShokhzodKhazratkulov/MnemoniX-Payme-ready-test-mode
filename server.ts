@@ -303,10 +303,16 @@ async function startServer() {
   } else {
     // Determine the absolute path to the dist folder
     const distPath = path.resolve(process.cwd(), "dist");
-    console.log(`Serving static files from: ${distPath}`);
+    console.log(`[Production] Serving static files from: ${distPath}`);
+    
+    // Serve static files from dist
     app.use(express.static(distPath));
+    
+    // Fallback for SPA
     app.get("*", (req: Request, res: Response) => {
-      res.sendFile(path.join(distPath, "index.html"));
+      const indexPath = path.join(distPath, "index.html");
+      console.log(`[Production] Request: ${req.url} -> Falling back to: ${indexPath}`);
+      res.sendFile(indexPath);
     });
   }
 
