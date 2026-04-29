@@ -58,7 +58,7 @@ app.post("/api/payme", async (req: Request, res: Response) => {
   }
 
   // Ensure case sensitivity and character matching for the base64 auth
-  const expectedAuth = `Basic ${Buffer.from(`Paycom:${paymeKey.trim()}`).toString('base64')}`;
+  const expectedAuth = `Basic ${Buffer.from(`Paycom:${paymeKey}`).toString('base64')}`;
   
   if (!authHeader || authHeader !== expectedAuth) {
     console.warn(`Unauthorized Payme request. Received: ${authHeader}, Expected: ${expectedAuth.substring(0, 15)}...`);
