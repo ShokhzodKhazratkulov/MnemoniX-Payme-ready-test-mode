@@ -70,36 +70,22 @@ export const SubscriptionPage: React.FC<Props> = ({ user, onNavigate, language, 
     
     setIsUpdating(true);
     try {
-      // Create payment record via backend to bypass RLS and ensure security
-      const response = await fetch('/api/payments/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          packageId: pkg.id,
-          amount: pkg.price
-        })
+      const { error } = await supabase.from('payments').insert({
+        user_id: user.id,
+        order_id: orderId,
+        amount: amountInTiyin,
+        package_type: pkg.id,
+        status: 'pending'
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create payment record');
-      }
-
-      const { orderId } = await response.json();
+      if (error) throw error;
 
       const merchantId = import.meta.env.VITE_PAYME_MERCHANT_ID;
       if (!merchantId) throw new Error("Payme Merchant ID missing");
 
-      // Payme Checkout Protocol
       const params = `m=${merchantId};ac.order_id=${orderId};a=${amountInTiyin}`;
       const base64Params = btoa(params);
-      
-      // Determine if we should use test or production URL
-      // If the ID starts with '5' or user explicitly requested test mode, we use test.paycom.uz
-      const isTestVendor = merchantId.startsWith('5');
-      const checkoutBaseUrl = isTestVendor ? 'https://test.paycom.uz' : 'https://checkout.paycom.uz';
-      const checkoutUrl = `${checkoutBaseUrl}/${base64Params}`;
+      const checkoutUrl = `https://checkout.paycom.uz/${base64Params}`;
 
       window.open(checkoutUrl, '_blank');
     } catch (err: any) {

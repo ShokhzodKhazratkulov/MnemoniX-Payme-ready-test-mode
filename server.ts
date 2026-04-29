@@ -63,42 +63,6 @@ app.post("/api/payme", async (req: Request, res: Response) => {
   }
 });
 
-// Endpoint to create a payment record securely
-app.post("/api/payments/create", async (req: Request, res: Response) => {
-  try {
-    const { userId, packageId, amount } = req.body;
-    
-    if (!userId || !packageId || !amount) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const orderId = `order_${userId}_${Date.now()}`;
-    const amountInTiyin = amount * 100;
-
-    const { data, error } = await supabase.from('payments').insert({
-      user_id: userId,
-      order_id: orderId,
-      amount: amountInTiyin,
-      package_type: packageId,
-      status: 'pending'
-    }).select().single();
-
-    if (error) {
-      console.error("Error creating payment record:", error);
-      return res.status(500).json({ error: error.message });
-    }
-
-    res.json({
-      orderId,
-      amount: amountInTiyin,
-      paymentId: data.id
-    });
-  } catch (err: any) {
-    console.error("Internal error in /api/payments/create:", err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 // --- Payme Method Handlers ---
 
 async function handleCheckPerform(params: any, id: any, res: any) {
