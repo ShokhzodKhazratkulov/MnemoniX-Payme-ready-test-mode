@@ -19,14 +19,27 @@ const supabase = createClient(
 
 app.use(bodyParser.json());
 
+// Request logging middleware
+app.use("/api", (req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // Health check for troubleshooting
 app.get("/api/health", (req, res) => {
+  const paymeKey = process.env.PAYME_KEY || "";
+  const maskedKey = paymeKey.length > 4 
+    ? paymeKey.substring(0, 2) + "..." + paymeKey.substring(paymeKey.length - 2) 
+    : "****";
+
   res.json({ 
     status: "ok", 
     timestamp: new Date().toISOString(),
     env: {
       hasPaymeKey: !!process.env.PAYME_KEY,
-      nodeEnv: process.env.NODE_ENV
+      paymeKeyPreview: maskedKey, // Helped verify if symbols are being read correctly
+      nodeEnv: process.env.NODE_ENV,
+      port: PORT
     }
   });
 });
@@ -44,10 +57,11 @@ app.post("/api/payme", async (req: Request, res: Response) => {
     return res.json({ id, error: { code: -32504, message: "Server configuration error" } });
   }
 
-  const expectedAuth = `Basic ${Buffer.from(`Paycom:${paymeKey}`).toString('base64')}`;
+  // Ensure case sensitivity and character matching for the base64 auth
+  const expectedAuth = `Basic ${Buffer.from(`Paycom:${paymeKey.trim()}`).toString('base64')}`;
   
   if (!authHeader || authHeader !== expectedAuth) {
-    console.warn("Unauthorized Payme request attempted");
+    console.warn(`Unauthorized Payme request. Received: ${authHeader}, Expected: ${expectedAuth.substring(0, 15)}...`);
     return res.json({ id, error: { code: -32504, message: "Error auth" } });
   }
 
