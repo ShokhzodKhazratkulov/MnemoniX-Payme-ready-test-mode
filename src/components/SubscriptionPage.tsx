@@ -96,9 +96,8 @@ export const SubscriptionPage: React.FC<Props> = ({ user, onNavigate, language, 
       const base64Params = btoa(params);
       
       // Determine if we should use test or production URL
-      // Use test environment if ID starts with '5' OR if VITE_PAYME_TEST_MODE is explicitly true
-      const isTestMode = import.meta.env.VITE_PAYME_TEST_MODE === 'true';
-      const isTestVendor = merchantId.startsWith('5') || isTestMode;
+      // If the ID starts with '5' or user explicitly requested test mode, we use test.paycom.uz
+      const isTestVendor = merchantId.startsWith('5');
       const checkoutBaseUrl = isTestVendor ? 'https://test.paycom.uz' : 'https://checkout.paycom.uz';
       const checkoutUrl = `${checkoutBaseUrl}/${base64Params}`;
 
