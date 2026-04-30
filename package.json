@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "start": "node index.js",
-    "build": "vite build && esbuild server.ts --bundle --platform=node --format=esm --outfile=index.js --external:vite --minify",
+    "start": "node server.js",
+    "build": "vite build && esbuild server.ts --bundle --platform=node --format=esm --outfile=server.js --external:vite --minify",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
   },

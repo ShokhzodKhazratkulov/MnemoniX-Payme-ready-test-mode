@@ -317,8 +317,19 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`[${new Date().toISOString()}] Server started successfully`);
+    console.log(`[${new Date().toISOString()}] Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`[${new Date().toISOString()}] Port: ${PORT}`);
+    console.log(`[${new Date().toISOString()}] Payme Key configured: ${!!process.env.PAYME_KEY}`);
   });
 }
+
+process.on('uncaughtException', (err) => {
+  console.error('[CRITICAL] Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[CRITICAL] Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
 startServer();
